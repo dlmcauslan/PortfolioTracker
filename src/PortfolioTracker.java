@@ -15,17 +15,22 @@ public class PortfolioTracker {
     }
 
     public static void main(String[] args) throws IOException {
-        Downloader DL1 = new Downloader("VAS.AX", "2014-09-10");
-//        DL1.download();
+        
         Database stockDB = new Database(StockDBContract.PATH);
         stockDB.createDatabase();
         stockDB.createTable(StockDBContract.HISTORICAL_TABLE_NAME, StockDBContract.HISTORICAL_COLUMN_LIST);
-        stockDB.insertIntoTable(StockDBContract.HISTORICAL_TABLE_NAME, 
-                                StockDBContract.HISTORICAL_COLUMNS, 
-                                "'VAP.AX', '2016-12-03', 73.21");
-        stockDB.selectFromTable("SELECT * FROM " + StockDBContract.HISTORICAL_TABLE_NAME);
-        stockDB.dropTable(StockDBContract.HISTORICAL_TABLE_NAME);
+        
+        Downloader DL1 = new Downloader(stockDB, "VAS.AX", "2016-12-05");
+        DL1.download();
+        
+//        stockDB.insertIntoTable(StockDBContract.HISTORICAL_TABLE_NAME, 
+//                                StockDBContract.HISTORICAL_COLUMNS, 
+//                                "'VAP.AX', '2016-12-03', 73.21");
 
+        historicalDBQueryResult result =  stockDB.selectFromTable("SELECT * FROM " + StockDBContract.HISTORICAL_TABLE_NAME);
+        result.printResult();
+        stockDB.dropTable(StockDBContract.HISTORICAL_TABLE_NAME);
+        
     }
 
 }

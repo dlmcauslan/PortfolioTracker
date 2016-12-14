@@ -21,6 +21,7 @@ public class Downloader {
     private final String stockCode;
     private final String startDate;
     private final String endDate;
+    private final Database database;
     private static final String MIN_DATE = "1800-01-01";
     private static final String URL_BASE = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20";
     private static final String URL_END = "&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
@@ -31,7 +32,8 @@ public class Downloader {
      * @param startDate - string for the start date of range of dates to be downloaded in format yyyy-mm-dd.
      * @param endDate -  string for the end date of range of dates to be downloaded in format yyyy-mm-dd.
      */
-    public Downloader(String stockCode, String startDate, String endDate) {
+    public Downloader(Database database, String stockCode, String startDate, String endDate) {
+        this.database = database;
         this.stockCode = stockCode;
         this.startDate = startDate;
         this.endDate = endDate;  
@@ -42,7 +44,8 @@ public class Downloader {
      * @param stockCode - Code of the stock to download
      * @param startDate - string for the start date of range of dates to be downloaded in format yyyy-mm-dd.
      */
-    public Downloader(String stockCode, String startDate) {
+    public Downloader(Database database, String stockCode, String startDate) {
+        this.database = database;
         this.stockCode = stockCode;
         this.startDate = startDate;
         LocalDate localDate = LocalDate.now();
@@ -53,7 +56,8 @@ public class Downloader {
      * Constructor for Downloader Class which sets start date as MIN_DATE and the end date as todays date.
      * @param stockCode - Code of the stock to download
      */
-    public Downloader(String stockCode) {
+    public Downloader(Database database, String stockCode) {
+        this.database = database;
         this.stockCode = stockCode;
         this.startDate = MIN_DATE;
         LocalDate localDate = LocalDate.now();
@@ -88,7 +92,7 @@ public class Downloader {
             getDataFromURL(DL_URL);
 //            System.out.println(minDate);
 //            System.out.println(maxDate);
-//            System.out.println(DL_URL);
+            System.out.println(DL_URL);
         }
     }
     
@@ -98,7 +102,7 @@ public class Downloader {
      * @param DL_URL - URL to download the stock data from
      * @throws IOException
      */
-    public void getDataFromURL(URL DL_URL) throws IOException {
+    private void getDataFromURL(URL DL_URL) throws IOException {
         try(InputStream is = DL_URL.openStream();
                 JsonReader rdr = Json.createReader(is)) {
             JsonObject obj = rdr.readObject();
@@ -107,12 +111,19 @@ public class Downloader {
             for (int i = dataArray.size() - 1; i >= 0; i--) {
                 JsonObject dataObj = dataArray.getJsonObject(i);
                 String date = dataObj.getString("Date");
-                double close = Double.parseDouble(dataObj.getString("Close"));
-                System.out.println(date + " - $" + close);
-                // TODO: Save in database
+//                double close = Double.parseDouble(dataObj.getString("Close"));
+                int close = Utilities.moneyStringToInt(dataObj.getString("Close"));
+//                System.out.println(date + " - $" + close);
+                // TODO: Save in database.
+//                String values = "'VAS.AX', '2013-12-02', 70.21";
+                String values = "'" + stockCode + "', '" + date + "', " + close;
+                database.insertIntoTable(StockDBContract.HISTORICAL_TABLE_NAME, 
+                                        StockDBContract.HISTORICAL_COLUMNS, values);
             }            
         }        
     }
+    
+
     
     /**
      * Getter for stock code
