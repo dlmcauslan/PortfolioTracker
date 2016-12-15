@@ -106,11 +106,11 @@ public class Database {
      * Performs the select query given by query on the database.
      * @param query
      */
-    public historicalDBQueryResult selectFromTable(String query)
+    public void selectFromTable(String tableName, String columns, String query)
     {
       Connection c = null;
       Statement stmt = null;
-      historicalDBQueryResult result = new historicalDBQueryResult();
+//      historicalDBQueryResult result = new historicalDBQueryResult();
       try {
         Class.forName("org.sqlite.JDBC");
         c = DriverManager.getConnection("jdbc:sqlite:" + databasePath);
@@ -120,29 +120,45 @@ public class Database {
         stmt = c.createStatement();
         ResultSet rs = stmt.executeQuery(query);
         
+        System.out.println("\n" + columns);
 
         while ( rs.next() ) {
-           String code = rs.getString(StockDBContract.HISTORICAL_CODE);
-           String date = rs.getString(StockDBContract.HISTORICAL_DATE);
-           int price  = rs.getInt(StockDBContract.HISTORICAL_PRICE);
+            if (tableName == StockContract.Historical.TABLE_NAME) {
+               String code = rs.getString(StockContract.Historical.CODE);
+               String date = rs.getString(StockContract.Historical.DATE);
+               double price  = Utilities.centsToDollars(rs.getInt(StockContract.Historical.PRICE));
+               System.out.println(code + "\t" + date + "\t" + price);
+            } else if (tableName == StockContract.Purchases.TABLE_NAME) {
+                System.out.println(rs.getInt(StockContract.Purchases.ID) + "\t"
+                        + rs.getString(StockContract.Purchases.CODE) + "\t" 
+                        + rs.getString(StockContract.Purchases.DATE) + "\t"
+                        + Utilities.centsToDollars(rs.getInt(StockContract.Purchases.PRICE)) + "\t"
+                        + rs.getInt(StockContract.Purchases.NUMBER_PURCHASED) + "\t"
+                        + Utilities.centsToDollars(rs.getInt(StockContract.Purchases.COST)));
+            } else if (tableName == StockContract.Dividend.TABLE_NAME) {
+                System.out.println(rs.getInt(StockContract.Dividend.ID) + "\t"
+                        + rs.getString(StockContract.Dividend.CODE) + "\t"
+                        + rs.getString(StockContract.Dividend.DATE) + "\t"
+                        + Utilities.centsToDollars(rs.getInt(StockContract.Dividend.AMOUNT)));
+            }
 //           String pk = rs.getString(StockDBContract.HISTORICAL_PK);
 //           System.out.println( "PK = " + pk );
 //           System.out.println( "Code = " + code );
 //           System.out.println( "Date = " + date );
 //           System.out.println( "Price = " + price );
            // TODO: save this information and return it. - Probably as 3 different arrayLists, saved in an object.
-           result.add(code, date, price);
+//           result.add(code, date, price);
         }
         rs.close();
         stmt.close();
         c.close();
       } catch ( Exception e ) {
         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-        System.exit(0);
-        return null;
+//        System.exit(0);
+//        return null;
       }
       System.out.println("Operation done successfully");
-      return result;
+//      return result;
     }
     
 }

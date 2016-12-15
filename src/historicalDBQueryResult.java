@@ -14,7 +14,8 @@ public class historicalDBQueryResult {
     }
     
     public void printResult() {
-        System.out.println("\n" + StockDBContract.HISTORICAL_COLUMNS);
+        System.out.println("\n" + StockContract.Historical.COLUMNS);
+        System.out.println("--------------------------");
         for (int i = 0; i < dates.size(); i++) {
             System.out.println(codes.get(i) + "  " + dates.get(i) + "  " + prices.get(i));
         }

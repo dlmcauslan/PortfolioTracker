@@ -16,6 +16,15 @@ public class Utilities {
     }
     
     /**
+     * Converts money from a double such as dd.cc to an integer value in cents.
+     * @param money - Dollar value double
+     * @return integer value of the money string in cents
+     */
+    public static int moneyDoubleToInt(double money) {
+        return (int) (100*money);
+    }
+    
+    /**
      * Converts a money value in cents to dollars and cents.
      * @param cents - integer value of money in cents
      * @return double value of money in dollars in cents

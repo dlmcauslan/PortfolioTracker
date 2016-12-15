@@ -117,8 +117,8 @@ public class Downloader {
                 // TODO: Save in database.
 //                String values = "'VAS.AX', '2013-12-02', 70.21";
                 String values = "'" + stockCode + "', '" + date + "', " + close;
-                database.insertIntoTable(StockDBContract.HISTORICAL_TABLE_NAME, 
-                                        StockDBContract.HISTORICAL_COLUMNS, values);
+                database.insertIntoTable(StockContract.Historical.TABLE_NAME, 
+                                        StockContract.Historical.COLUMNS, values);
             }            
         }        
     }
